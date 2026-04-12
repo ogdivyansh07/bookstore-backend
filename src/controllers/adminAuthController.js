@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 
 function adminLogin(req, res) {
   const password =
-    req.body && typeof req.body.password === 'string' ? req.body.password : '';
-  const expected = process.env.ADMIN_PASSWORD;
+    req.body && typeof req.body.password === 'string' ? req.body.password.trim() : '';
+  const expected = (process.env.ADMIN_PASSWORD || '').trim();
   const secret = process.env.JWT_SECRET;
 
   if (!expected || !secret) {
