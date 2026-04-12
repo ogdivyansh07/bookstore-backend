@@ -4,30 +4,33 @@ const express = require('express');
 const cors = require("cors");
 const connectDB = require('./config/database');
 const routes = require('./routes');
-const uploadRoutes = require('./routes/uploadRoutes'); // ✅ added
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
+
+// ✅ Middleware
 app.use(cors());
-
 app.use(express.json());
-app.use('/', routes);
-app.use('/upload', uploadRoutes); // ✅ added
 
+// ✅ Routes
+app.use('/', routes);
+app.use('/upload', uploadRoutes);
+
+// ✅ Error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ message: 'Internal server error' });
 });
 
-const port = Number(process.env.PORT) || 3000;
+// ✅ PORT (IMPORTANT for Render)
+const port = process.env.PORT || 3000;
 
-async function start() {
-  await connectDB();
-  app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}`);
-  });
-}
-
-start().catch((err) => {
-  console.error(err);
-  process.exit(1);
+// ✅ START SERVER FIRST (fix for Render)
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
+
+// ✅ CONNECT DB AFTER SERVER STARTS
+connectDB()
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB error:", err));
