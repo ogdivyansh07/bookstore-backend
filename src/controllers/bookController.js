@@ -11,7 +11,7 @@ async function createBook(req, res, next) {
     res.status(201).json(book);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).json({ message: err.message });
+      return res.status(400).json({ message: 'Invalid request data' });
     }
     next(err);
   }
@@ -60,7 +60,7 @@ async function updateBook(req, res, next) {
     res.json(book);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).json({ message: err.message });
+      return res.status(400).json({ message: 'Invalid request data' });
     }
     next(err);
   }

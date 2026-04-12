@@ -3,11 +3,16 @@ const multer = require("multer");
 const csv = require("csv-parser");
 const fs = require("fs");
 const Book = require("../models/Book");
+const verifyAdmin = require("../middleware/verifyAdmin");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-router.post("/", upload.single("file"), (req, res) => {
+router.post("/", verifyAdmin, upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "File required" });
+  }
+
   const results = [];
 
   fs.createReadStream(req.file.path)
@@ -30,7 +35,8 @@ router.post("/", upload.single("file"), (req, res) => {
 
         res.json({ message: "Books uploaded successfully", count: books.length });
       } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ message: "Upload failed" });
       }
     });
 });
