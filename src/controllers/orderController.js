@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
+
+const ORDER_STATUSES = ['pending', 'confirmed', 'delivered'];
 
 function createOrder(req, res) {
   const { books, totalPrice, customerName, phone, address } = req.body || {};
@@ -31,6 +34,7 @@ function createOrder(req, res) {
       res.status(201).json({
         message: 'Order placed',
         orderId: doc._id,
+        status: doc.status,
       })
     )
     .catch((err) => {
@@ -50,4 +54,30 @@ function getOrders(req, res) {
     });
 }
 
-module.exports = { createOrder, getOrders };
+function updateOrderStatus(req, res) {
+  const { id } = req.params;
+  const { status } = req.body || {};
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid order id' });
+  }
+
+  if (typeof status !== 'string' || !ORDER_STATUSES.includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  Order.findByIdAndUpdate(id, { $set: { status } }, { new: true, runValidators: true })
+    .lean()
+    .then((doc) => {
+      if (!doc) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      res.json(doc);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: 'Could not update order' });
+    });
+}
+
+module.exports = { createOrder, getOrders, updateOrderStatus };
