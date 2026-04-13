@@ -11,11 +11,16 @@ function createOrder(req, res) {
   }
 
   const name = typeof customerName === 'string' ? customerName.trim() : '';
-  const phoneStr = typeof phone === 'string' ? phone.trim() : '';
   const addr = typeof address === 'string' ? address.trim() : '';
 
-  if (!name || !phoneStr || !addr) {
+  if (!name || !addr) {
     return res.status(400).json({ message: 'Name, phone, and address are required' });
+  }
+
+  const phoneInput = typeof phone === 'string' ? phone : phone != null ? String(phone) : '';
+  const normalizedPhone = phoneInput.replace(/\D/g, '').slice(-10);
+  if (!normalizedPhone || normalizedPhone.length !== 10) {
+    return res.status(400).json({ message: 'Invalid phone number' });
   }
 
   const priceNum = Number(totalPrice);
@@ -27,7 +32,7 @@ function createOrder(req, res) {
     books,
     totalPrice: priceNum,
     customerName: name,
-    phone: phoneStr,
+    phone: normalizedPhone,
     address: addr,
   })
     .then((doc) =>
@@ -59,14 +64,14 @@ function trackOrdersByPhone(req, res) {
   try {
     raw = decodeURIComponent(raw == null ? '' : String(raw));
   } catch {
-    return res.status(400).json({ message: 'Invalid phone' });
+    return res.status(400).json({ message: 'Invalid phone number' });
   }
-  const phone = String(raw).trim();
-  if (!phone) {
-    return res.status(400).json({ message: 'Phone required' });
+  const normalizedPhone = String(raw).replace(/\D/g, '').slice(-10);
+  if (!normalizedPhone || normalizedPhone.length !== 10) {
+    return res.status(400).json({ message: 'Invalid phone number' });
   }
 
-  Order.find({ phone })
+  Order.find({ phone: normalizedPhone })
     .sort({ createdAt: -1 })
     .lean()
     .then((orders) => res.json(orders))
