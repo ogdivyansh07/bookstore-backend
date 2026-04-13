@@ -8,6 +8,7 @@ const connectDB = require('./config/database');
 const getCorsOptions = require('./config/corsOptions');
 const routes = require('./routes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(generalLimiter);
 app.use(express.json({ limit: '1mb' }));
 
 app.use('/', routes);
+app.use('/orders', orderRoutes);
 app.use('/upload', uploadRoutes);
 
 app.use((err, req, res, next) => {
