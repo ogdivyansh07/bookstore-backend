@@ -54,6 +54,28 @@ function getOrders(req, res) {
     });
 }
 
+function trackOrdersByPhone(req, res) {
+  let raw = req.params.phone;
+  try {
+    raw = decodeURIComponent(raw == null ? '' : String(raw));
+  } catch {
+    return res.status(400).json({ message: 'Invalid phone' });
+  }
+  const phone = String(raw).trim();
+  if (!phone) {
+    return res.status(400).json({ message: 'Phone required' });
+  }
+
+  Order.find({ phone })
+    .sort({ createdAt: -1 })
+    .lean()
+    .then((orders) => res.json(orders))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: 'Could not load orders' });
+    });
+}
+
 function updateOrderStatus(req, res) {
   const { id } = req.params;
   const { status } = req.body || {};
@@ -80,4 +102,4 @@ function updateOrderStatus(req, res) {
     });
 }
 
-module.exports = { createOrder, getOrders, updateOrderStatus };
+module.exports = { createOrder, getOrders, trackOrdersByPhone, updateOrderStatus };
