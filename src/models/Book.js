@@ -7,6 +7,7 @@ const bookSchema = new mongoose.Schema(
     price:   { type: Number },
     class:   { type: String, default: '' },
     subject: { type: String, default: '' },
+    category: { type: String, default: 'General' },
     image:   { type: String, default: '' },
   },
   { timestamps: true }

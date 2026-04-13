@@ -29,7 +29,7 @@ function validateCreateBook(req, res, next) {
     return res.status(400).json({ message: 'Invalid price' });
   }
 
-  for (const key of ['class', 'subject', 'image']) {
+  for (const key of ['class', 'subject', 'category', 'image']) {
     if (!isOptionalString(b[key])) {
       return res.status(400).json({ message: 'Invalid request data' });
     }
@@ -54,7 +54,7 @@ function validateUpdateBook(req, res, next) {
     return res.status(400).json({ message: 'Invalid price' });
   }
 
-  for (const key of ['class', 'subject', 'image']) {
+  for (const key of ['class', 'subject', 'category', 'image']) {
     if (b[key] !== undefined && !isOptionalString(b[key])) {
       return res.status(400).json({ message: 'Invalid request data' });
     }
